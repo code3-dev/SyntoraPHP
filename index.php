@@ -38,12 +38,12 @@ use SyntoraPHP\App\Route;
 | Getting Started:
 | To create a new SyntoraPHP project, you can use Composer by running the
 | following command:
-|   composer create-project darkphp/apiSyntoraPHP myapp
+|   composer create-project pira/syntora myapp
 |
 | GitHub Repository:
 | For more information and to explore the framework's source code, you can
 | visit the SyntoraPHP GitHub repository at:
-|   https://github.com/ReactMVC/SyntoraPHP
+|   https://github.com/code3-dev/SyntoraPHP
 |
 | Developer Information:
 | SyntoraPHP is developed by Hossein Pira. If you have any questions,
