@@ -1,0 +1,338 @@
+#!/usr/bin/env php
+<?php
+
+if (php_sapi_name() !== 'cli') {
+    exit('Syntora CLI can only be run from the command line.');
+}
+
+require __DIR__.'/vendor/autoload.php';
+
+class Syntora {
+    private $commands = [
+        'make:controller' => 'Create a new controller class',
+        'make:model' => 'Create a new model class',
+        'make:view' => 'Create a new view file',
+        'list' => 'List all available commands'
+    ];
+
+    private $controllerTemplate = <<<'EOT'
+<?php
+
+namespace SyntoraPHP\App\Controllers;
+
+class {className}
+{
+    public function index()
+    {
+        // Handle GET request
+    }
+
+    public function show($id)
+    {
+        // Handle GET request for specific resource
+    }
+
+    public function create()
+    {
+        // Handle GET request for create form
+    }
+
+    public function store()
+    {
+        // Handle POST request
+    }
+
+    public function edit($id)
+    {
+        // Handle GET request for edit form
+    }
+
+    public function update($id)
+    {
+        // Handle PUT/PATCH request
+    }
+
+    public function delete($id)
+    {
+        // Handle DELETE request
+    }
+}
+EOT;
+
+    private $modelTemplate = <<<'EOT'
+<?php
+
+namespace SyntoraPHP\App\Models;
+
+/**
+ * {className} - A model class for handling {classNameLower} data
+ */
+class {className}
+{
+    private $data = [];
+
+    /**
+     * Constructor - initializes a new {className} instance
+     */
+    public function __construct()
+    {
+        // Initialize your model here
+    }
+
+    /**
+     * find - finds a {classNameLower} by ID
+     *
+     * @param int $id - the ID to find
+     * @return array|null - returns the {classNameLower} data or null if not found
+     */
+    public function find($id)
+    {
+        // Implement find logic
+        return null;
+    }
+
+    /**
+     * all - gets all {classNameLower}s
+     *
+     * @return array - returns all {classNameLower}s
+     */
+    public function all()
+    {
+        // Implement get all logic
+        return [];
+    }
+
+    /**
+     * create - creates a new {classNameLower}
+     *
+     * @param array $data - the data to create the {classNameLower} with
+     * @return bool - returns true if successful, false otherwise
+     */
+    public function create($data)
+    {
+        // Implement create logic
+        return false;
+    }
+
+    /**
+     * update - updates a {classNameLower}
+     *
+     * @param int $id - the ID of the {classNameLower} to update
+     * @param array $data - the data to update the {classNameLower} with
+     * @return bool - returns true if successful, false otherwise
+     */
+    public function update($id, $data)
+    {
+        // Implement update logic
+        return false;
+    }
+
+    /**
+     * delete - deletes a {classNameLower}
+     *
+     * @param int $id - the ID of the {classNameLower} to delete
+     * @return bool - returns true if successful, false otherwise
+     */
+    public function delete($id)
+    {
+        // Implement delete logic
+        return false;
+    }
+}
+EOT;
+
+    private $viewTemplate = <<<'EOT'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $title ?? '{viewName}'; ?> - SyntoraPHP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Figtree', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-white dark:bg-gray-800 shadow">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                    <?php echo $title ?? '{viewName}'; ?>
+                </h1>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+                <!-- Replace with your content -->
+                <div class="px-4 py-6 sm:px-0">
+                    <div class="border-4 border-dashed border-gray-200 rounded-lg h-96 p-4">
+                        <p class="text-gray-500 dark:text-gray-400">
+                            This is the {viewName} view template. Start building your content here.
+                        </p>
+                    </div>
+                </div>
+                <!-- /End replace -->
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white dark:bg-gray-800 shadow mt-8">
+            <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+                <p class="text-center text-gray-500 dark:text-gray-400 text-sm">
+                    &copy; <?php echo date('Y'); ?> SyntoraPHP. All rights reserved.
+                </p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
+EOT;
+
+    public function run($argv) {
+        if (count($argv) < 2) {
+            $this->showHelp();
+            return;
+        }
+
+        $command = $argv[1];
+
+        switch ($command) {
+            case 'make:controller':
+                if (!isset($argv[2])) {
+                    echo "Error: Controller name is required.\n";
+                    echo "Usage: php syntora make:controller ControllerName\n";
+                    return;
+                }
+                $this->makeController($argv[2]);
+                break;
+
+            case 'make:model':
+                if (!isset($argv[2])) {
+                    echo "Error: Model name is required.\n";
+                    echo "Usage: php syntora make:model ModelName\n";
+                    return;
+                }
+                $this->makeModel($argv[2]);
+                break;
+
+            case 'make:view':
+                if (!isset($argv[2])) {
+                    echo "Error: View name is required.\n";
+                    echo "Usage: php syntora make:view viewName\n";
+                    return;
+                }
+                $this->makeView($argv[2]);
+                break;
+
+            case 'list':
+                $this->showHelp();
+                break;
+
+            default:
+                echo "Error: Unknown command '{$command}'\n";
+                $this->showHelp();
+                break;
+        }
+    }
+
+    private function makeController($name) {
+        // Ensure the name ends with Controller if not already
+        if (!str_ends_with(strtolower($name), 'controller')) {
+            $name = $name . 'Controller';
+        }
+
+        // Capitalize first letter
+        $name = ucfirst($name);
+
+        $content = str_replace('{className}', $name, $this->controllerTemplate);
+        $path = __DIR__ . '/App/Controllers/' . $name . '.php';
+
+        if (file_exists($path)) {
+            echo "Error: Controller '{$name}' already exists.\n";
+            return;
+        }
+
+        if (!is_dir(__DIR__ . '/App/Controllers')) {
+            mkdir(__DIR__ . '/App/Controllers', 0755, true);
+        }
+
+        if (file_put_contents($path, $content)) {
+            echo "Controller created successfully: {$path}\n";
+        } else {
+            echo "Error: Could not create controller.\n";
+        }
+    }
+
+    private function makeModel($name) {
+        // Capitalize first letter
+        $name = ucfirst($name);
+        
+        $content = str_replace(
+            ['{className}', '{classNameLower}'],
+            [$name, strtolower($name)],
+            $this->modelTemplate
+        );
+        
+        $path = __DIR__ . '/App/Models/' . $name . '.php';
+
+        if (file_exists($path)) {
+            echo "Error: Model '{$name}' already exists.\n";
+            return;
+        }
+
+        if (!is_dir(__DIR__ . '/App/Models')) {
+            mkdir(__DIR__ . '/App/Models', 0755, true);
+        }
+
+        if (file_put_contents($path, $content)) {
+            echo "Model created successfully: {$path}\n";
+        } else {
+            echo "Error: Could not create model.\n";
+        }
+    }
+
+    private function makeView($name) {
+        // Remove .php extension if provided
+        $name = str_replace('.php', '', $name);
+        
+        // Convert to lowercase for view files
+        $name = strtolower($name);
+        
+        $content = str_replace('{viewName}', $name, $this->viewTemplate);
+        $path = __DIR__ . '/views/' . $name . '.php';
+
+        if (file_exists($path)) {
+            echo "Error: View '{$name}' already exists.\n";
+            return;
+        }
+
+        if (!is_dir(__DIR__ . '/views')) {
+            mkdir(__DIR__ . '/views', 0755, true);
+        }
+
+        if (file_put_contents($path, $content)) {
+            echo "View created successfully: {$path}\n";
+        } else {
+            echo "Error: Could not create view.\n";
+        }
+    }
+
+    private function showHelp() {
+        echo "Syntora Framework CLI Tool\n\n";
+        echo "Available commands:\n";
+        
+        foreach ($this->commands as $command => $description) {
+            echo sprintf("  %-20s %s\n", $command, $description);
+        }
+    }
+}
+
+$syntora = new Syntora();
+$syntora->run($argv); 

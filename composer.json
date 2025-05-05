@@ -1,0 +1,37 @@
+{
+    "name": "pira/syntora",
+    "description": "Fast PHP API Framework",
+    "type": "project",
+    "keywords": [
+        "php framework",
+        "php",
+        "php-api",
+        "api-framework",
+        "framework",
+        "mvc"
+    ],
+    "support": {
+		"issues": "https://github.com/code3-dev/SyntoraPHP/issues",
+		"source": "https://github.com/code3-dev/SyntoraPHP"
+	},
+    "license": "MIT",
+    "homepage": "https://SyntoraPHP.github.io",
+    "autoload": {
+        "psr-4": {
+            "SyntoraPHP\\": "./",
+            "SyntoraPHP\\App\\Controllers\\": "Controllers/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Hossein Pira",
+            "email": "h3dev.pira@gmail.com",
+            "homepage": "https://t.me/h3dev",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "filp/whoops": "^2.15",
+        "catfan/medoo": "^2.1"
+    }
+}
